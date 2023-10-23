@@ -6,9 +6,6 @@
 BluetoothSerial ESP_BT; //class init
 const int pin1 = 34;         // pin for output
 const int pin2 = 23;         // pin for output
-const int freq = 1000;  //freq
-const int resolution = 8;
-int dutycycle = 127;  // on and off ratio
 int i = 0;
 long long number = 0;
 int digits[10] = { '\0' };
@@ -18,12 +15,9 @@ char dura[8] = { 0 };
 //////////////////////////
 
 void setup() {
-  
   //attach pins and setup
   Serial.begin(19200);
   ESP_BT.begin("ESP32_169");
-
-  
 }
 
 void update() {
@@ -49,26 +43,35 @@ void update() {
 }
 
 void vibrate() {
-if (direc = 1){
-for (int i = 0; i<vibetime;i++){
-  analog.write(pin1,255);  //pin 1 //right
-      }  
+//1 is left 2 is both 3 is right
+if (direc = 1 ){                        
+  for (int i = 0; i<vibetime;i++){
+    analog.write(pin1,255);  //pin 1 //left
+    delay(200);            // --> might change into delay dura // not tested yet
+    }  
 }else if (direc = 2){
   for (int i = 0; i<vibetime;i++){
-   analog.write(pin2,255);  // pin 2 //left
-        }  
-}else{
+    analog.write(pin2,255);
+    analog.write(pin1,255);
+    delay(200);  // pin1 and 2
+    }  
+}else if (direc = 3){
+  for (int i = 0; i<vibetime;i++){
+    analog.write(pin2,255);
+    delay(200);  // pin 2 //right
+    }  
+}else{  // case anything else 
   break();
   } 
 }
-
-void main() {
+// main loop we repeat
+void loop() {
   if (ESP_BT.available())
   {
     number = ESP_BT.read();
   }
   update();
   if (direc != 0){
-    vibrate();
+  vibrate();
   }
 }
