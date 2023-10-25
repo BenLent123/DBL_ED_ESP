@@ -1,0 +1,9 @@
+This code is the C/C++ side of the ESP32 D0WDQ6 haptic navigation system
+
+The idea is that a phone or location connection gives a signal to the esp when it is required to turn akin to a navigation system, the ESP will vibrate the left or right buzzer accordingly at a certain rate / frequncy etc.
+
+Required Circuit parts:
+- ESP32 D0WDQ6  (Any ESP32 really)
+- 2 vibration motors (1V min to max 3.3V) (Max ESP32 output voltage is 3.3V)
+- Power supply (Vin up to 5V) (with regulators or some version have other tolerances)
+- Location data connection with ESP32 app 
