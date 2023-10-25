@@ -2,76 +2,73 @@
 #include <string.h>
 #include <stdlib.h>
 #include "BluetoothSerial.h"
-//global variables
 BluetoothSerial ESP_BT; //class init
-const int pin1 = 34;         // pin for output
-const int pin2 = 23;         // pin for output
-int i = 0;
-long long number = 0;
-int digits[10] = { '\0' };
-int direc;
-int vibtime;
-char dura[8] = { 0 };
-//////////////////////////
+const int pin1 = 23;         // pin for output
+const int pin2 = 22;         // pin for output
+int ESPBT_incoming;
+int direction; // 1 is left, 2 is both, 3 is right
+int number_of__vibrations; // 1-9 how many times we repeat the vibration
+int duration; //duration of delay each vibration
 
 void setup() {
-  //attach pins and setup
   Serial.begin(19200);
   ESP_BT.begin("ESP32_169");
 }
 
-void update() {
-  i = 0;
-  while (number != 0) {
-    digits[i] = number % 10;
-    number = number / 10;
-    i++;
-  }
-
-  int reversedigits[i];
-  for (int j = 0; j < 10; j++) {
-    reversedigits[j] = digits[i - j - 1];
-  }
-
-  direc = reversedigits[0];
-  vibetime = reversedigits[1];
-  for (int z = 2; z < i; z++) {
-    char temp[2];
-    sprintf(temp, "%d", reversedigits[z]);
-    strcat(dura, temp);
-  }
-}
 
 void vibrate() {
-//1 is left 2 is both 3 is right
-if (direc = 1 ){                        
-  for (int i = 0; i<vibetime;i++){
-    analog.write(pin1,255);  //pin 1 //left
-    delay(200);            // --> might change into delay dura // not tested yet
+  duration = ESPBT_incoming % 10 // last digit in number
+  vibetime = ((ESPBT_incoming - duration) / 10) % 10 // middle digit in number
+  direction = (((ESPBT_incoming - duration) / 10) - number_of__vibrations) / 10 // first digit in number  
+
+if (direction = 1 ){                        
+  for (int i = 0; i<number_of__vibrations;i++){
+    analog.write(pin1,255);  
+    delay(duration * 300);        
+    analog.write(pin1,0);
+    delay(300)
     }  
-}else if (direc = 2){
-  for (int i = 0; i<vibetime;i++){
+}else if (direction = 2){
+  for (int i = 0; i<number_of__vibrations;i++){
+    analog.write(pin1,255);  
+    analog.write(pin2,255); 
+    delay(duration * 300);
+    analog.write(pin1,0);
+    analog.write(pin2,0);
+    delay(300)
+    }  
+}else if (direction = 3){
+  for (int i = 0; i<number_of__vibrations;i++){
     analog.write(pin2,255);
-    analog.write(pin1,255);
-    delay(200);  // pin1 and 2
+    delay(duration * 300);
+    analog.write(pin2,0);
+    delay(300)
     }  
-}else if (direc = 3){
-  for (int i = 0; i<vibetime;i++){
-    analog.write(pin2,255);
-    delay(200);  // pin 2 //right
-    }  
-}else{  // case anything else 
-  break();
-  } 
 }
-// main loop we repeat
+}
+
 void loop() {
-  if (ESP_BT.available())
+   if (ESP_BT.available())
   {
-    number = ESP_BT.read();
+    ESPBT_incoming = ESP_BT.read();
   }
-  update();
-  if (direc != 0){
   vibrate();
-  }
 }
+
+
+/* 
+void VibrateRightON(){
+analog.write(pin1,255);  
+}
+void VibrateRightOFF(){
+analog.write(pin1,0);  
+}
+void VibrateLeftON(){
+analog.write(pin2,255);    
+}
+void VibrateLeftOFF(){
+analog.write(pin2,0);  
+}
+
+*/
+
